@@ -3,7 +3,7 @@ module telebackup
 go 1.21
 
 require (
-	github.com/amarnathcjd/gogram v0.0.0-20240120121202-00e0b33d4246
+	github.com/amarnathcjd/gogram v0.0.0-20240121172811-faabee383727
 	gopkg.in/yaml.v3 v3.0.1
 )
 
