@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/amarnathcjd/gogram/telegram"
+	"log"
 	"os"
 	"strings"
 	"sync"
@@ -45,28 +46,28 @@ func main() {
 		go func() {
 			tempFile, err := os.CreateTemp("", "telebackup-*.tar.gz")
 			if err != nil {
-				fmt.Println(err)
+				log.Println("Error creating temp file", err)
 				return
 			}
 			buf, _ := os.OpenFile(tempFile.Name(), os.O_CREATE|os.O_WRONLY, 0644)
 			err = compress.CompressPath(path, buf)
 			if err != nil {
-				fmt.Println(err)
+				log.Println("Error compressing path", err)
 				return
 			}
 			dirs := strings.Split(path, "/")
 			lastDir := dirs[len(dirs)-1]
 			file, err := client.UploadFile(tempFile.Name(), &telegram.UploadOptions{FileName: lastDir + fmt.Sprintf("-%d.tar.gz", time.Now().Unix())})
 			if err != nil {
-				fmt.Println(err)
+				log.Println("Error uploading file", err)
 				return
 			}
 			_, err = client.SendMedia(resultConfig.Target, file, &telegram.MediaOptions{Caption: path})
 			if err != nil {
-				fmt.Println(err)
+				log.Println("Error sending file", err)
 				return
 			}
-			fmt.Println("Done", path)
+			log.Println(path, "sent")
 			wg.Done()
 		}()
 		wg.Add(1)
