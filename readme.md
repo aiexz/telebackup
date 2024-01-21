@@ -8,8 +8,8 @@ Telebackup is a simple backup tool for Telegram. It allows you to back up your l
 - File upload up to 2GB
 
 ## Installation
-> [!NOTE]
-> Releases will be available soon
+### Download binary
+You can download prebuilt binaries from [releases](https://github.com/aiexz/telebackup/releases/latest) page
 
 ### Build from source
 ```bash

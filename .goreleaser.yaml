@@ -31,6 +31,10 @@ archives:
     format_overrides:
       - goos: windows
         format: zip
+    files:
+      - readme.md
+      - LICENSE
+      - config.example.yml
 
 changelog:
   sort: asc
