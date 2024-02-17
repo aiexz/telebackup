@@ -14,12 +14,11 @@ import (
 func CompressPath(targetPath string, buf io.Writer) error {
 	// check if targetPath is directory
 	_, err := os.Stat(targetPath)
-	//get parent directory of targetPath
-	baseDir := path.Dir(targetPath)
-
 	if err != nil {
 		return err
 	}
+	//get parent directory of targetPath
+	baseDir := path.Dir(targetPath)
 	// taken from https://gist.github.com/mimoo/25fc9716e0f1353791f5908f94d6e726
 	zr := gzip.NewWriter(buf)
 	tw := tar.NewWriter(zr)
@@ -29,6 +28,11 @@ func CompressPath(targetPath string, buf io.Writer) error {
 		if err != nil {
 			fmt.Println(err)
 			return err
+		}
+
+		if header.Mode&0400 == 0 {
+			fmt.Println("Skipping file", file, "as it is not readable")
+			return nil
 		}
 
 		relPath, err := filepath.Rel(baseDir, file)
