@@ -29,17 +29,20 @@ go build cmd/telebackup/main.go
 appId: 6 # Telegram APP ID
 appHash: eb06d4abfb49dc3eeb1aeb98ae0f581e # Telegram API Hash
 botToken: 123:AAA # Telegram Bot Token
-target: "@aiexz" # Telegram chat/channel username
+target: 56789123 # Telegram chat/channel username or chat ID
 targets:
-    - /tmp/test # List of files/directories to backup
+    - /tmp/test # List of files/directories to back up
     - /tmp/test2
 ```
 
+> [!TIP]
+> It is recommended to create a group or channel with the bot to not spam your personal messages
+
+
 ## Roadmap
-- [ ] Make automated releases with GitHub Actions
 - [ ] Handle files larger than 2GB
 - [ ] Support for forums (chats with topics)
-- [ ] Support for usage without username, just chat ID
+- [x] Support for usage without username, just chat ID
 - [ ] Encryption/password protection
 - [ ] Signing backups
 

@@ -4,3 +4,5 @@
 # config
 config.yml
 dist/
+
+.DS_Store

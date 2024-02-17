@@ -9,7 +9,26 @@ type Config struct {
 	// Telegram Bot Token
 	BotToken string `yaml:"botToken"`
 	// Telegram user to send messages to
-	Target string `yaml:"target"`
+	Target Target `yaml:"target"`
 	// Optional: Mapping of paths and topics
 	Targets []string `yaml:"targets"`
+}
+
+type Target struct {
+	Username string
+	ID       int64
+}
+
+func (t *Target) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var username string
+	var ID int64
+	if err := unmarshal(&ID); err == nil {
+		t.ID = ID
+		return nil
+	}
+	if err := unmarshal(&username); err == nil {
+		t.Username = username
+		return nil
+	}
+	return nil
 }
