@@ -40,20 +40,21 @@ func (s *Sender) Start() error {
 type SendOptions struct {
 	Caption  string
 	FileName string
+	Thread   int32
 }
 
-func (s *Sender) SendMedia(target config.Target, path string, options *SendOptions) error {
+func (s *Sender) SendMedia(target config.TelegramTarget, path string, options *SendOptions) error {
 	targetResolved, err := s.ResolveTarget(target)
 	if err != nil {
 		return err
 	}
 
-	_, err = s.client.SendMedia(targetResolved, path, &telegram.MediaOptions{Caption: options.Caption, FileName: options.FileName})
+	_, err = s.client.SendMedia(targetResolved, path, &telegram.MediaOptions{Caption: options.Caption, FileName: options.FileName, ReplyID: options.Thread})
 	return err
 }
 
-// ResolveTarget resolves the config.Target to a telegram.ChatObj, telegram.Channel or telegram.UserObj
-func (s *Sender) ResolveTarget(target config.Target) (interface{}, error) {
+// ResolveTarget resolves the config.TelegramTarget to a telegram.ChatObj, telegram.Channel or telegram.UserObj
+func (s *Sender) ResolveTarget(target config.TelegramTarget) (interface{}, error) {
 	if target.Username != "" {
 		if resolved, ok := s.cache[target.Username]; ok {
 			return resolved, nil

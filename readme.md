@@ -41,7 +41,7 @@ targets:
 
 ## Roadmap
 - [ ] Handle files larger than 2GB
-- [ ] Support for forums (chats with topics)
+- [x] Support for forums (chats with topics)
 - [x] Support for usage without username, just chat ID
 - [ ] Encryption/password protection
 - [ ] Signing backups

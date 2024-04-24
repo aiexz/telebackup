@@ -3,5 +3,6 @@ appHash: eb06d4abfb49dc3eeb1aeb98ae0f581e
 botToken: 1234567890:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 target: 987654321 # or "@username"
 targets:
-    - /tmp/test
+    - topic: 2
+      path: /tmp/test
     - /tmp/test2

@@ -11,7 +11,8 @@ botToken: 3
 target: "@test"
 targets:
     - /test
-    - /test2
+    - topic: 2
+      path: /test2
 `)
 	config, err := ParseConfig(data)
 	if err != nil {
@@ -26,17 +27,20 @@ targets:
 	if config.BotToken != "3" {
 		t.Error("BotToken not parsed correctly")
 	}
-	if config.Target.Username != "@test" {
+	if config.TelegramTarget.Username != "@test" {
 		t.Error("ChatID not parsed correctly")
 	}
-	if len(config.Targets) != 2 {
-		t.Error("Targets not parsed correctly")
+	if len(config.PathTarget) != 2 {
+		t.Error("PathTarget not parsed correctly")
 	}
-	if config.Targets[0] != "/test" {
+	if config.PathTarget[0].GetPath() != "/test" {
 		t.Error("Topic not parsed correctly")
 	}
-	if config.Targets[1] != "/test2" {
-		t.Error("Topic not parsed correctly")
+	if !config.PathTarget[1].IsForum() {
+		t.Error("Forum not parsed correctly")
+	}
+	if config.PathTarget[1].GetPath() != "/test2" || config.PathTarget[1].Forum.Topic != 2 {
+		t.Error("Forum not parsed correctly")
 	}
 	data = []byte(`appId: 1
 appHash: 2
@@ -47,7 +51,7 @@ targets:
     - /test2
 `)
 	config, err = ParseConfig(data)
-	if config.Target.ID != int64(123) {
+	if config.TelegramTarget.ID != int64(123) {
 		t.Error("ChatID not parsed correctly")
 	}
 }

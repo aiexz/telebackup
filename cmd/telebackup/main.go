@@ -35,8 +35,14 @@ func main() {
 	}
 
 	wg := &sync.WaitGroup{}
-	for _, path := range resultConfig.Targets {
-		path := path
+	for _, target := range resultConfig.PathTarget {
+		var thread int32
+		var path string
+		if target.IsForum() {
+			thread, path = target.Forum.Topic, target.GetPath()
+		} else {
+			path = target.GetPath()
+		}
 		go func() {
 			tempFile, err := os.CreateTemp("", "telebackup-*.tar.gz")
 			if err != nil {
@@ -53,7 +59,7 @@ func main() {
 
 			dirs := strings.Split(path, "/")
 			lastDir := dirs[len(dirs)-1]
-			err = client.SendMedia(resultConfig.Target, tempFile.Name(), &sender.SendOptions{Caption: path, FileName: lastDir + fmt.Sprintf("-%d.tar.gz", time.Now().Unix())})
+			err = client.SendMedia(resultConfig.TelegramTarget, tempFile.Name(), &sender.SendOptions{Caption: path, FileName: lastDir + fmt.Sprintf("-%d.tar.gz", time.Now().Unix()), Thread: thread})
 			if err != nil {
 				log.Println("Error sending file", path, err)
 				return
