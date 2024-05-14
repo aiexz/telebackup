@@ -44,6 +44,7 @@ func main() {
 			path = target.GetPath()
 		}
 		go func() {
+			defer wg.Done()
 			tempFile, err := os.CreateTemp("", "telebackup-*.tar.gz")
 			if err != nil {
 				log.Println("Error creating temp file", err)
@@ -66,7 +67,7 @@ func main() {
 			}
 
 			log.Println(path, "sent")
-			wg.Done()
+
 		}()
 		wg.Add(1)
 	}
