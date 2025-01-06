@@ -4,7 +4,9 @@ import (
 	"errors"
 	"github.com/aiexz/telebackup/internal/config"
 	"github.com/amarnathcjd/gogram/telegram"
+	"log/slog"
 	"strconv"
+	"time"
 )
 
 type Sender struct {
@@ -26,14 +28,40 @@ func NewSender(AppID int32, AppHash string, BotToken string) (*Sender, error) {
 }
 
 func (s *Sender) Start() error {
-	if err := s.client.Connect(); err != nil {
-		return err
+	// wait for 10 seconds to connect to telegram servers and try to reconnect if failed
+	for i := 0; i < 10; i++ {
+		errChan := make(chan error)
+		go func() {
+			errChan <- s.client.Connect()
+		}()
+		select {
+		case err := <-errChan:
+			if err != nil {
+				return err
+			}
+			break
+		case <-time.After(10 * time.Second):
+			slog.Debug("telegram client is not connected, trying to reconnect")
+		}
 	}
 
-	// Authenticate the client using the bot token
-	if err := s.client.LoginBot(s.botToken); err != nil {
-		return err
+	for i := 0; i < 10; i++ {
+		// Authenticate the client using the bot token
+		errChan := make(chan error)
+		go func() {
+			errChan <- s.client.LoginBot(s.botToken)
+		}()
+		select {
+		case err := <-errChan:
+			if err != nil {
+				return err
+			}
+			break
+		case <-time.After(10 * time.Second):
+			slog.Debug("telegram client is not authorized, trying to authorize")
+		}
 	}
+
 	return nil
 }
 
