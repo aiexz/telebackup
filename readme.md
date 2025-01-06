@@ -18,6 +18,13 @@ cd telebackup
 go build cmd/telebackup/main.go
 ```
 
+### Run in Docker
+```bash
+docker run -v /path/to/config.yml:/config.yml -v /path/to/dir:/dr ghcr.io/aiexz/telebackup:master
+```
+
+
+
 ## Usage
 1. Create a Telegram bot using [BotFather](https://t.me/botfather) and get bot token
 2. Get APP ID & API Hash from [my.telegram.org](https://my.telegram.org) or use provided in example
@@ -38,6 +45,38 @@ targets:
 > [!TIP]
 > It is recommended to create a group or channel with the bot to not spam your personal messages
 
+
+## Real-world example
+Here is our minecraft server
+```yaml
+services:
+  mc:
+    image: itzg/minecraft-server
+    ports:
+      - "25565:25565"
+    environment:
+      EULA: "TRUE"
+    volumes:
+      - ./data:/data
+  telebackup:
+    container_name: telebackup_mc
+    image: ghcr.io/aiexz/telebackup:master
+    depends_on:
+      - mc
+    environment:
+      APP_ID: 6
+      APP_HASH: 123
+      BOT_TOKEN: 123:abc
+      TARGET: 123
+      TARGETS: |
+        /data
+    volumes:
+      - ./data:/data:ro
+  ```
+We also add a cron job to backup the server every day
+```bash
+0 0 * * * docker start telebackup_mc
+```
 
 ## Roadmap
 - [ ] Handle files larger than 2GB
