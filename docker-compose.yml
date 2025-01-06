@@ -1,6 +1,6 @@
 services:
   telebackup:
-    image: ghcr.io/aiexz/telebackup:latest
+    image: ghcr.io/aiexz/telebackup:master
     environment:
       APP_ID: 6
       APP_HASH: 123
@@ -10,6 +10,8 @@ services:
         /test
         /test2
     volumes:
-      - /tmp/test:/test:ro
-      - /tmp/test2:/test2:ro
+      - /tmp/test:/tmp/test:ro
+      - /tmp/test2:/tmp/test2:ro
+# or use this if you want to use a config file and not environment variables
+#    volumes:
 #      - ./config.yml:/config.yml
