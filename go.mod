@@ -3,7 +3,7 @@ module github.com/aiexz/telebackup
 go 1.23.4
 
 require (
-	github.com/amarnathcjd/gogram v0.0.0-20240214191025-2289f29312b1
+	github.com/amarnathcjd/gogram v1.5.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
