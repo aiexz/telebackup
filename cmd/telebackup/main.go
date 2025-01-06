@@ -9,6 +9,7 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -48,14 +49,32 @@ func main() {
 	flag.Parse()
 	setupLogger(*logLevel)
 	slog.Debug("Starting telebackup", "config", *configFile)
+	resultConfig := &config.Config{}
+	if os.Getenv("APP_ID") != "" {
+		// maybe use another way to check if env should be used
+		slog.Debug("Using env variables for config")
+		var err error
+		resultConfig, err = config.ParseEnvConfig()
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		slog.Debug("Using config file for config")
+		workingDir, err := os.Getwd()
+		if err != nil {
+			panic(err)
+		}
+		configFilePath := filepath.Join(workingDir, *configFile)
+		slog.Debug("config file path", "path", configFilePath)
+		reader, err := os.ReadFile(configFilePath)
 
-	reader, err := os.ReadFile(*configFile)
-	if err != nil {
-		panic(err)
-	}
-	resultConfig, err := config.ParseConfig(reader)
-	if err != nil {
-		panic(err)
+		if err != nil {
+			panic(err)
+		}
+		resultConfig, err = config.ParseFileConfig(reader)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	client, err := sender.NewSender(resultConfig.AppID, resultConfig.AppHash, resultConfig.BotToken)

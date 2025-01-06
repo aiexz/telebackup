@@ -1,0 +1,15 @@
+services:
+  telebackup:
+    image: ghcr.io/aiexz/telebackup:latest
+    environment:
+      APP_ID: 6
+      APP_HASH: 123
+      BOT_TOKEN: 123:abc
+      TARGET: 123
+      TARGETS: |
+        /test
+        /test2
+    volumes:
+      - /tmp/test:/test:ro
+      - /tmp/test2:/test2:ro
+#      - ./config.yml:/config.yml
