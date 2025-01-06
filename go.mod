@@ -1,6 +1,6 @@
-module telebackup
+module github.com/aiexz/telebackup
 
-go 1.21
+go 1.23.4
 
 require (
 	github.com/amarnathcjd/gogram v0.0.0-20240214191025-2289f29312b1
@@ -9,5 +9,5 @@ require (
 
 require (
 	github.com/pkg/errors v0.9.1 // indirect
-	golang.org/x/net v0.20.0 // indirect
+	golang.org/x/net v0.33.0 // indirect
 )

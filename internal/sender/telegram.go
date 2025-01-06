@@ -2,9 +2,9 @@ package sender
 
 import (
 	"errors"
+	"github.com/aiexz/telebackup/internal/config"
 	"github.com/amarnathcjd/gogram/telegram"
 	"strconv"
-	"telebackup/internal/config"
 )
 
 type Sender struct {
@@ -17,7 +17,7 @@ func NewSender(AppID int32, AppHash string, BotToken string) (*Sender, error) {
 	client, err := telegram.NewClient(telegram.ClientConfig{
 		AppID:    int32(AppID),
 		AppHash:  AppHash,
-		LogLevel: telegram.LogWarn,
+		LogLevel: telegram.LogError,
 	})
 	if err != nil {
 		return nil, err

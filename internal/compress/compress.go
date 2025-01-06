@@ -3,8 +3,8 @@ package compress
 import (
 	"archive/tar"
 	"compress/gzip"
-	"fmt"
 	"io"
+	"log/slog"
 	"os"
 	"path"
 	"path/filepath"
@@ -26,18 +26,19 @@ func CompressPath(targetPath string, buf io.Writer) error {
 		// generate tar header
 		header, err := tar.FileInfoHeader(fi, file)
 		if err != nil {
-			fmt.Println(err)
+			slog.Error("Some error occured", "err", err)
+			// IDK what are these errors so we just print them
 			return err
 		}
 
 		if header.Mode&0400 == 0 {
-			fmt.Println("Skipping file", file, "as it is not readable")
+			slog.Debug("Skipping file", "file", file, "reason", "not readable rights")
 			return nil
 		}
 
 		relPath, err := filepath.Rel(baseDir, file)
 		if err != nil {
-			fmt.Println(err)
+			slog.Error("Some error occured", "err", err)
 			return err
 		}
 
@@ -45,30 +46,30 @@ func CompressPath(targetPath string, buf io.Writer) error {
 
 		// write header
 		if err := tw.WriteHeader(header); err != nil {
-			fmt.Println(err)
+			slog.Error("Some error occured", "err", err)
 			return err
 		}
 		// if not a dir, write file content
 		if !fi.IsDir() {
 			data, err := os.Open(file)
 			if err != nil {
-				fmt.Println(err)
+				slog.Error("Some error occured", "err", err)
 				return err
 			}
 			if _, err := io.Copy(tw, data); err != nil {
-				fmt.Println(err)
+				slog.Error("Some error occured", "err", err)
 				return err
 			}
 		}
 		return nil
 	})
 	if err := tw.Close(); err != nil {
-		fmt.Println(err)
+		slog.Error("Some error occured", "err", err)
 		return err
 	}
 	// produce gzip
 	if err := zr.Close(); err != nil {
-		fmt.Println(err)
+		slog.Error("Some error occured", "err", err)
 		return err
 	}
 	return nil
