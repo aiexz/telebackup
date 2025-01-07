@@ -1,4 +1,4 @@
-name: Create and publish a Docker image
+name: Build go binary
 
 # Configures this workflow to run every time a change is pushed to the branch called `release`.
 on:
@@ -9,7 +9,7 @@ on:
 
 # There is a single job in this workflow. It's configured to run on the latest available version of Ubuntu.
 jobs:
-  build-and-push-image:
+  build-and-test:
     runs-on: ubuntu-latest
 
       #
@@ -38,11 +38,11 @@ jobs:
 
       - name: Cross-compile
         run: |
-          GOOS=linux GOARCH=amd64 go build cmd/telebackup/main.go -o telebackup_linux_amd64
-          GOOS=linux GOARCH=arm64 go build cmd/telebackup/main.go -o telebackup_linux_arm64
-          GOOS=windows GOARCH=amd64 go build cmd/telebackup/main.go -o telebackup_windows_amd64.exe
-          GOOS=darwin GOARCH=amd64 go build cmd/telebackup/main.go -o telebackup_darwin_amd64
-          GOOS=darwin GOARCH=arm64 go build cmd/telebackup/main.go -o telebackup_darwin_arm64
+          GOOS=linux GOARCH=amd64 go build -o telebackup_linux_amd64 cmd/telebackup/main.go
+          GOOS=linux GOARCH=arm64 go build -o telebackup_linux_arm64 cmd/telebackup/main.go 
+          GOOS=windows GOARCH=amd64 go build -o telebackup_windows_amd64.exe cmd/telebackup/main.go 
+          GOOS=darwin GOARCH=amd64 go build -o telebackup_darwin_amd64 cmd/telebackup/main.go 
+          GOOS=darwin GOARCH=arm64 go build -o telebackup_darwin_arm64 cmd/telebackup/main.go 
 
       - name: Publish artifact
         uses: actions/upload-artifact@v4
