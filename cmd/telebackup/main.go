@@ -64,7 +64,13 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		configFilePath := filepath.Join(workingDir, *configFile)
+		var configFilePath string
+		if *configFile != "config.yml" {
+			configFilePath = *configFile
+		} else {
+			configFilePath = filepath.Join(workingDir, "config.yml")
+		}
+		//TODO: add test for config file detection
 		slog.Debug("config file path", "path", configFilePath)
 		reader, err := os.ReadFile(configFilePath)
 
