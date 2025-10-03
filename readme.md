@@ -5,7 +5,7 @@ Telebackup is a simple backup tool for Telegram. It allows you to back up your l
 
 ## Features
 - Supports multiple files/directories
-- File upload up to 2GB
+- File upload up to 2GB (automatically splits larger archives into multiple parts)
 
 ## Installation
 ### Download binary
@@ -79,7 +79,7 @@ We also add a cron job to backup the server every day
 ```
 
 ## Roadmap
-- [ ] Handle files larger than 2GB
+- [x] Handle files larger than 2GB (implemented with automatic splitting)
 - [x] Support for forums (chats with topics)
 - [x] Support for usage without username, just chat ID
 - [ ] Encryption/password protection

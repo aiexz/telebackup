@@ -112,33 +112,77 @@ func main() {
 				slog.Error("Error creating temp file", "error", err)
 				return
 			}
-			defer func(name string) {
-				err := os.Remove(name)
-				if err != nil {
-					slog.Debug("Error removing temp file", "error", err)
-					//	it is debug because it is not critical
-				}
-			}(tempFile.Name())
-
-			buf, err := os.OpenFile(tempFile.Name(), os.O_CREATE|os.O_WRONLY, 0644)
+			
+			// Create a split writer that will handle splitting into 2GB parts
+			splitWriter, err := compress.NewSplitWriter(tempFile.Name())
 			if err != nil {
-				slog.Error("Error opening temp file", "error", err)
+				slog.Error("Error creating split writer", "error", err)
+				os.Remove(tempFile.Name())
 				return
 			}
-			err = compress.CompressPath(path, buf)
+			
+			// Compress to the split writer
+			err = compress.CompressPath(path, splitWriter)
 			if err != nil {
 				slog.Error("Error compressing path", "error", err)
+				splitWriter.Close()
+				// Clean up all parts
+				for _, part := range splitWriter.Parts() {
+					os.Remove(part)
+				}
 				return
 			}
+			
+			// Close the split writer
+			if err := splitWriter.Close(); err != nil {
+				slog.Error("Error closing split writer", "error", err)
+				return
+			}
+			
+			// Get all parts
+			parts := splitWriter.Parts()
+			
+			// Clean up function for all parts
+			defer func() {
+				for _, part := range parts {
+					err := os.Remove(part)
+					if err != nil {
+						slog.Debug("Error removing temp file", "error", err, "file", part)
+					}
+				}
+			}()
 
 			dirs := strings.Split(path, "/")
 			lastDir := dirs[len(dirs)-1]
-			err = client.SendMedia(resultConfig.TelegramTarget, tempFile.Name(), &sender.SendOptions{Caption: path, FileName: lastDir + fmt.Sprintf("-%d.tar.gz", time.Now().Unix()), Thread: thread})
-			if err != nil {
-				slog.Error("Error sending file", "path", path, "error", err)
-				return
+			timestamp := time.Now().Unix()
+			
+			// Send all parts
+			for i, partPath := range parts {
+				var fileName string
+				if len(parts) == 1 {
+					fileName = lastDir + fmt.Sprintf("-%d.tar.gz", timestamp)
+				} else {
+					fileName = lastDir + fmt.Sprintf("-%d.tar.gz.part%d", timestamp, i+1)
+				}
+				
+				caption := fmt.Sprintf("%s (part %d/%d)", path, i+1, len(parts))
+				if len(parts) == 1 {
+					caption = path
+				}
+				
+				slog.Info("Sending file part", "path", path, "part", i+1, "total", len(parts))
+				err = client.SendMedia(resultConfig.TelegramTarget, partPath, &sender.SendOptions{
+					Caption:  caption,
+					FileName: fileName,
+					Thread:   thread,
+				})
+				if err != nil {
+					slog.Error("Error sending file part", "path", path, "part", i+1, "error", err)
+					return
+				}
 			}
-			slog.Info("File sent", "path", path)
+			
+			slog.Info("File sent successfully", "path", path, "parts", len(parts))
 
 		}()
 		wg.Add(1)
